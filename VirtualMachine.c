@@ -10,6 +10,12 @@ typedef enum {
     HLT
 } InstructionSet;
 
+//registers
+typedef enum {
+    A, B, C, D, PC, SP,
+    NUM_REGISTERS
+} Registers;
+
 //current program
 const int program[] = {
     PSH, 5,
@@ -19,16 +25,19 @@ const int program[] = {
     HLT
 };
 
-int program_counter = 0;
-int stack_pointer = -1;
 int stack[256];
+int registers[NUM_REGISTERS];
 bool running = true;
 
 int main() {
+    //init SP and PC
+    registers[PC] = 0;
+    registers[SP] = -1;
+    
     while(running) {
         //fetch 
         int current_instruction = fetch();
-        program_counter++;
+        registers[PC]++;
         
         //decode and execute
         execute(current_instruction);
@@ -37,7 +46,7 @@ int main() {
 }
 
 int fetch() {
-    return program[program_counter];
+    return program[registers[PC]];
 }
 
 void execute(int instruction) {
@@ -48,22 +57,22 @@ void execute(int instruction) {
             break;
         case PSH:
             //pushes next value onto the stack
-            stack[++stack_pointer] = program[++program_counter];
+            stack[++registers[SP]] = program[++registers[PC]];
             break;
         case POP:
             //gets value and decrements sp
-            int popped_value = stack[stack_pointer--];
+            int popped_value = stack[registers[SP]--];
             
             //prints val
             printf("Popped: %d \n", popped_value);
             break;
         case ADD:
             //pops numbers to add
-            int a = stack[stack_pointer--];
-            int b = stack[stack_pointer--];
+            int a = stack[registers[SP]--];
+            int b = stack[registers[SP]--];
             
             //pushes result back onto the stack
-            stack[++stack_pointer] = a + b; 
+            stack[++registers[SP]] = a + b; 
             break;
     }
 }
