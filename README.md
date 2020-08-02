@@ -1,2 +1,2 @@
 # basic-virtual-machine
-Super simple stack based virtual machine written in C
+Super simple virtual machine with a stack written in C
