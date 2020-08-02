@@ -67,12 +67,18 @@ void execute(int instruction) {
             printf("Popped: %d \n", popped_value);
             break;
         case ADD:
-            //pops numbers to add
-            int a = stack[registers[SP]--];
-            int b = stack[registers[SP]--];
+            //adds number to the A register
+            int a = registers[A];
+            int b = program[++registers[PC]];
             
-            //pushes result back onto the stack
-            stack[++registers[SP]] = a + b; 
+            //puts result back into the A register
+            registers[A] = a + b;
             break;
+        case SET:
+            //get the register to change from program
+            int reg = program[--registers[PC]];
+
+            //change the register with the next value in program
+            registers[reg] = program[--registers[PC]];
     }
 }
