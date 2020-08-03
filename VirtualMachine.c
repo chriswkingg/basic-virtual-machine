@@ -20,8 +20,8 @@ typedef enum {
 //current program
 const int program[] = {
     PSH, 5,
-    SET, A, 5,
-    ADD, 5,
+    SET, A, 7,
+    ADD, 21,
     OUT, A,
     HLT
 };
@@ -42,11 +42,14 @@ void execute(int instruction) {
             break;
         }
         case PSH: {
+            printf("Push\n");
             //pushes next value onto the stack
-            stack[++registers[SP]] = program[++registers[PC]];
+            stack[++registers[SP]] = program[registers[PC]++];
             break;
         }
         case POP: {
+            printf("Pop\n");
+            
             //gets value and decrements sp
             int popped_value = stack[registers[SP]--];
             
@@ -55,25 +58,30 @@ void execute(int instruction) {
             break;
         }
         case ADD: {
+            printf("Add\n");
+            
             //adds number to the A register
             int a = registers[A];
-            int b = program[++registers[PC]];
+            int b = program[registers[PC]++];
             
             //puts result back into the A register
             registers[A] = a + b;
             break;
         }
         case SET: {
+            printf("Set\n");
+            
             //get the register to change from program
-            int reg = program[++registers[PC]];
+            int reg = program[registers[PC]++];
 
             //change the register with the next value in program
-            registers[reg] = program[++registers[PC]];
+            registers[reg] = program[registers[PC]++];
             break;
         }
         case OUT: {
+            printf("Out\n");
             //prints out value stored in register
-            printf("Out: %d\n", registers[program[++registers[PC]]]);
+            printf("Out: %d\n", registers[program[registers[PC]++]]);
             break;  
         }
     }
