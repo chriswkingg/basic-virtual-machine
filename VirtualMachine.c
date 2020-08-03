@@ -6,7 +6,9 @@ typedef enum {
     PSH,
     POP,
     ADD,
+    SUB,
     SET,
+    MOV,
     HLT,
     OUT
 } InstructionSet;
@@ -36,11 +38,6 @@ int fetch() {
 
 void execute(int instruction) {
     switch(instruction) {
-        case HLT: {
-            //stops the machine
-            running = false;
-            break;
-        }
         case PSH: {
             printf("Push\n");
             //pushes next value onto the stack
@@ -60,12 +57,21 @@ void execute(int instruction) {
         case ADD: {
             printf("Add\n");
             
-            //adds number to the A register
-            int a = registers[A];
-            int b = program[registers[PC]++];
+            //gets number to the A register
+            int x = program[registers[PC]++];
             
             //puts result back into the A register
-            registers[A] = a + b;
+            registers[A] += x;
+            break;
+        }
+        case SUB: {
+            printf("Sub\n");
+            
+            //gets number to subtract from A register
+            int x = program[registers[PC]++];
+            
+            //puts result back into the A register
+            registers[A] -= x;
             break;
         }
         case SET: {
@@ -76,6 +82,24 @@ void execute(int instruction) {
 
             //change the register with the next value in program
             registers[reg] = program[registers[PC]++];
+            break;
+        }
+        case MOV: {
+            printf("Mov");
+            
+            //get source and dest 
+            int dest = program[registers[PC]++];
+            int source = program[registers[PC]++];
+
+            //copy
+            registers[dest] = registers[source];
+            break;
+        }
+        case HLT: {
+            printf("Halt");
+            
+            //stops the machine
+            running = false;
             break;
         }
         case OUT: {
