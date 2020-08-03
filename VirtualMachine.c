@@ -3,14 +3,14 @@
 
 //all instructions
 typedef enum {
-    PSH,
-    POP,
-    ADD,
-    SUB,
-    SET,
-    MOV,
-    HLT,
-    OUT
+    PSH,    //Pushes a value onto the stack ex: PSH, 12
+    POP,    //Pops a value from the stack ex: POP, B
+    ADD,    //Adds a value to the A register ex: ADD, 2
+    SUB,    //Subtracts a value from the A register ex: SUB, 3
+    SET,    //Sets value of any register ex: SET, B, 23
+    MOV,    //Copies first register value into second register ex: MOV, A, PC
+    HLT,    //Halts the machine ex: HLT
+    OUT     //Outputs contents of a register ex: OUT A
 } InstructionSet;
 
 //registers
@@ -50,8 +50,8 @@ void execute(int instruction) {
             //gets value and decrements sp
             int popped_value = stack[registers[SP]--];
             
-            //prints val
-            printf("Popped: %d \n", popped_value);
+            //stores value in register
+            registers[program[registers[PC]++]] = popped_value;
             break;
         }
         case ADD: {
@@ -88,8 +88,8 @@ void execute(int instruction) {
             printf("Mov");
             
             //get source and dest 
-            int dest = program[registers[PC]++];
             int source = program[registers[PC]++];
+            int dest = program[registers[PC]++];
 
             //copy
             registers[dest] = registers[source];
@@ -116,11 +116,12 @@ int main() {
     registers[PC] = 0;
     registers[SP] = -1;
     
+    //system clock
     while(running) {
         //fetch 
         int current_instruction = fetch();
         registers[PC]++;
-        printf("PC: %d CI: %d \n", registers[PC], current_instruction);
+        printf("PC: %d \n", registers[PC]);
         
         //decode and execute
         execute(current_instruction);
