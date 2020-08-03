@@ -9,6 +9,8 @@ typedef enum {
     SUB,    //Subtracts a value from the A register ex: SUB, 3
     SET,    //Sets value of any register ex: SET, B, 23
     MOV,    //Copies first register value into second register ex: MOV, A, PC
+    JSR,    //Jumps to a subroutine ex: JSR 23
+    RTS,    //Returns from a subroutine ex: RTS
     HLT,    //Halts the machine ex: HLT
     OUT     //Outputs contents of a register ex: OUT A
 } InstructionSet;
@@ -25,6 +27,11 @@ const int program[] = {
     SET, A, 7,
     ADD, 21,
     OUT, A,
+    POP, A,
+    OUT, A,
+    JSR, 15,
+    OUT, A,
+    RTS,
     HLT
 };
 
@@ -85,7 +92,7 @@ void execute(int instruction) {
             break;
         }
         case MOV: {
-            printf("Mov");
+            printf("Mov\n");
             
             //get source and dest 
             int source = program[registers[PC]++];
@@ -93,6 +100,25 @@ void execute(int instruction) {
 
             //copy
             registers[dest] = registers[source];
+            break;
+        }
+        case JSR: {
+            printf("Jsr\n");
+            
+            //get adress to jump to and push current onto stack
+            int jump_adress = program[registers[PC]++];
+            stack[++registers[SP]] = registers[PC];
+
+            //jump
+            registers[PC] = jump_adress;
+            break;
+        }
+        case RTS: {
+            printf("Rts\n");
+            
+            //pull adress from stack and jump
+            int jump_adress = stack[registers[SP]--];
+            registers[PC] = jump_adress;
             break;
         }
         case HLT: {
