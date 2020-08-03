@@ -9,11 +9,12 @@ typedef enum {
     SUB,    //Subtracts a value from the A register ex: SUB, 3
     SET,    //Sets value of any register ex: SET, B, 23
     MOV,    //Copies first register value into second register ex: MOV, A, PC
-    JSR,    //Jumps to a subroutine ex: JSR 23
+    JSR,    //Jumps to a subroutine ex: JSR, 23
     RTS,    //Returns from a subroutine ex: RTS
+    BEQ,    //Branch to adress if 0 is in A register ex: BEQ, 12
     HLT,    //Halts the machine ex: HLT
-    IOT,    //Outputs contents of a register ex: OUT A
-    COT     //Outputs contents of a register as char ex: OUT B
+    IOT,    //Outputs contents of a register ex: OUT, A
+    COT     //Outputs contents of a register as char ex: OUT, B
 } InstructionSet;
 
 //registers
@@ -133,18 +134,27 @@ void execute(int instruction) {
             registers[PC] = jump_adress;
             break;
         }
+        case BEQ: {
+            //gets adress
+            int adress = program[registers[PC]++];
+            //branch if zero
+            if(registers[A] == 0) {
+                registers[PC] = adress;
+            }
+            break;
+        }
         case HLT: {
             //stops the machine
             running = false;
             break;
         }
         case IOT: {
-            //prints out value stored in register
+            //prints int value stored in register
             printf("%d\n", registers[program[registers[PC]++]]);
             break;  
         }
         case COT: {
-            //prints the value stored in the register 
+            //prints char value stored in the register 
             printf("%c\n", registers[program[registers[PC]++]]);
             break;
         }
