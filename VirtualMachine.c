@@ -12,7 +12,8 @@ typedef enum {
     JSR,    //Jumps to a subroutine ex: JSR 23
     RTS,    //Returns from a subroutine ex: RTS
     HLT,    //Halts the machine ex: HLT
-    OUT     //Outputs contents of a register ex: OUT A
+    IOT,    //Outputs contents of a register ex: OUT A
+    COT     //Outputs contents of a register as char ex: OUT B
 } InstructionSet;
 
 //registers
@@ -23,15 +24,12 @@ typedef enum {
 
 //current program
 const int program[] = {
-    PSH, 5,
+    PSH, 63,
     SET, A, 7,
     ADD, 21,
-    OUT, A,
+    IOT, A,
     POP, A,
-    OUT, A,
-    JSR, 15,
-    OUT, A,
-    RTS,
+    COT, A,
     HLT
 };
 
@@ -46,14 +44,11 @@ int fetch() {
 void execute(int instruction) {
     switch(instruction) {
         case PSH: {
-            printf("Push\n");
             //pushes next value onto the stack
             stack[++registers[SP]] = program[registers[PC]++];
             break;
         }
         case POP: {
-            printf("Pop\n");
-            
             //gets value and decrements sp
             int popped_value = stack[registers[SP]--];
             
@@ -62,8 +57,6 @@ void execute(int instruction) {
             break;
         }
         case ADD: {
-            printf("Add\n");
-            
             //gets number to the A register
             int x = program[registers[PC]++];
             
@@ -72,8 +65,6 @@ void execute(int instruction) {
             break;
         }
         case SUB: {
-            printf("Sub\n");
-            
             //gets number to subtract from A register
             int x = program[registers[PC]++];
             
@@ -82,8 +73,6 @@ void execute(int instruction) {
             break;
         }
         case SET: {
-            printf("Set\n");
-            
             //get the register to change from program
             int reg = program[registers[PC]++];
 
@@ -92,8 +81,6 @@ void execute(int instruction) {
             break;
         }
         case MOV: {
-            printf("Mov\n");
-            
             //get source and dest 
             int source = program[registers[PC]++];
             int dest = program[registers[PC]++];
@@ -103,8 +90,6 @@ void execute(int instruction) {
             break;
         }
         case JSR: {
-            printf("Jsr\n");
-            
             //get adress to jump to and push current onto stack
             int jump_adress = program[registers[PC]++];
             stack[++registers[SP]] = registers[PC];
@@ -114,25 +99,25 @@ void execute(int instruction) {
             break;
         }
         case RTS: {
-            printf("Rts\n");
-            
             //pull adress from stack and jump
             int jump_adress = stack[registers[SP]--];
             registers[PC] = jump_adress;
             break;
         }
         case HLT: {
-            printf("Halt");
-            
             //stops the machine
             running = false;
             break;
         }
-        case OUT: {
-            printf("Out\n");
+        case IOT: {
             //prints out value stored in register
-            printf("Out: %d\n", registers[program[registers[PC]++]]);
+            printf("%d\n", registers[program[registers[PC]++]]);
             break;  
+        }
+        case COT: {
+            //prints the value stored in the register 
+            printf("%c\n", registers[program[registers[PC]++]]);
+            break;
         }
     }
 }
@@ -147,7 +132,6 @@ int main() {
         //fetch 
         int current_instruction = fetch();
         registers[PC]++;
-        printf("PC: %d \n", registers[PC]);
         
         //decode and execute
         execute(current_instruction);
