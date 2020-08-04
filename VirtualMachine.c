@@ -5,12 +5,6 @@
 #define fetch program[registers[PC]]
 #define MAX_PROGRAM_SIZE 512
 
-//global variables
-int* program;
-int stack[256];
-int registers[NUM_REGISTERS];
-bool running = true;
-
 //all instructions
 typedef enum {
     PSH,    //Pushes a value onto the stack ex: PSH, 12
@@ -21,7 +15,7 @@ typedef enum {
     MOV,    //Copies first register value into second register ex: MOV, A, PC
     JSR,    //Jumps to a subroutine ex: JSR, 23
     RTS,    //Returns from a subroutine ex: RTS
-    BEQ,    //Branch to adress if 0 is in A register ex: BEQ, 12
+    JZ,     //Branch to adress if 0 is in A register ex: BEQ, 12
     HLT,    //Halts the machine ex: HLT
     IOT,    //Outputs contents of a register ex: OUT, A
     COT     //Outputs contents of a register as char ex: OUT, B
@@ -32,6 +26,12 @@ typedef enum {
     A, B, C, D, PC, SP,
     NUM_REGISTERS
 } Registers;
+
+//global variables
+int* program;
+int stack[256];
+int registers[NUM_REGISTERS];
+bool running = true;
 
 void execute(int instruction) {
     switch(instruction) {
@@ -99,7 +99,7 @@ void execute(int instruction) {
             registers[PC] = jump_adress;
             break;
         }
-        case BEQ: {
+        case JZ: {
             //gets adress
             int adress = program[registers[PC]++];
             
