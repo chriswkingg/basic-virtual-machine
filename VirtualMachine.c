@@ -37,29 +37,17 @@ const int program[] = {
     PSH, 108,
     PSH, 101,
     PSH, 72,
-    //prints out hello world (22 is last addr)
+    SET, B, 0,
+    //prints out hello world
     POP, A,
     COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
-    POP, A,
-    COT, A,
+    MOV, B, A,
+    SUB, 10,
+    BEQ, 47,
+    MOV, B, A,
+    ADD, 1,
+    MOV, A, B,
+    SET, PC, 25,
     HLT
 };
 
@@ -79,6 +67,9 @@ void execute(int instruction) {
             break;
         }
         case POP: {
+            //check if stack has value
+            if(registers[SP] < 0) printf("\nError: Tried to pop empty stack");
+            
             //gets value and decrements sp
             int popped_value = stack[registers[SP]--];
             
@@ -150,12 +141,12 @@ void execute(int instruction) {
         }
         case IOT: {
             //prints int value stored in register
-            printf("%d\n", registers[program[registers[PC]++]]);
+            printf("%d", registers[program[registers[PC]++]]);
             break;  
         }
         case COT: {
             //prints char value stored in the register 
-            printf("%c\n", registers[program[registers[PC]++]]);
+            printf("%c", registers[program[registers[PC]++]]);
             break;
         }
     }
