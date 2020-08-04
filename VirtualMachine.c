@@ -5,6 +5,12 @@
 #define fetch program[registers[PC]]
 #define MAX_PROGRAM_SIZE 512
 
+//global variables
+int* program;
+int stack[256];
+int registers[NUM_REGISTERS];
+bool running = true;
+
 //all instructions
 typedef enum {
     PSH,    //Pushes a value onto the stack ex: PSH, 12
@@ -26,13 +32,6 @@ typedef enum {
     A, B, C, D, PC, SP,
     NUM_REGISTERS
 } Registers;
-
-//global variables
-int* program;
-int stack[256];
-int registers[NUM_REGISTERS];
-bool running = true;
-
 
 void execute(int instruction) {
     switch(instruction) {
