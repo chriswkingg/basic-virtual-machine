@@ -1,5 +1,9 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
+
+#define fetch program[registers[PC]]
+#define MAX_PROGRAM_SIZE 512
 
 //all instructions
 typedef enum {
@@ -23,41 +27,12 @@ typedef enum {
     NUM_REGISTERS
 } Registers;
 
-//current program
-const int program[] = {
-    //pushes "Hello world" onto the stack
-    PSH, 100,
-    PSH, 108,
-    PSH, 114,
-    PSH, 111,
-    PSH, 119,
-    PSH, 32,
-    PSH, 111,
-    PSH, 108,
-    PSH, 108,
-    PSH, 101,
-    PSH, 72,
-    SET, B, 0,
-    //prints out hello world
-    POP, A,
-    COT, A,
-    MOV, B, A,
-    SUB, 10,
-    BEQ, 47,
-    MOV, B, A,
-    ADD, 1,
-    MOV, A, B,
-    SET, PC, 25,
-    HLT
-};
-
+//global variables
+int* program;
 int stack[256];
 int registers[NUM_REGISTERS];
 bool running = true;
 
-int fetch() {
-    return program[registers[PC]];
-}
 
 void execute(int instruction) {
     switch(instruction) {
@@ -68,7 +43,7 @@ void execute(int instruction) {
         }
         case POP: {
             //check if stack has value
-            if(registers[SP] < 0) printf("\nError: Tried to pop empty stack");
+            if(registers[SP] < 0) printf("\nBVM Error: Tried to pop empty stack");
             
             //gets value and decrements sp
             int popped_value = stack[registers[SP]--];
@@ -128,6 +103,7 @@ void execute(int instruction) {
         case BEQ: {
             //gets adress
             int adress = program[registers[PC]++];
+            
             //branch if zero
             if(registers[A] == 0) {
                 registers[PC] = adress;
@@ -152,19 +128,54 @@ void execute(int instruction) {
     }
 }
 
-int main() {
+int* read_program(char file_name[]) {
+    //create and open file
+    FILE *file;
+    int *program = malloc(sizeof(int) * MAX_PROGRAM_SIZE);
+    file = fopen(file_name, "r");
+    
+    //check if file opened properly
+    if(file == NULL) {
+        printf("BVM Fatal Error: could not open file \n");
+        running = false;
+        return 0;
+    }
+    
+    //read file
+    for(int i = 0; i < MAX_PROGRAM_SIZE; i++) {
+        fscanf(file, "%d", &program[i]);
+    }
+    
+    //close file
+    fclose(file);
+    return program;
+}
+
+int main(int argc, char* argv[]) {
     //init SP and PC
     registers[PC] = 0;
     registers[SP] = -1;
     
+    //read program from file
+    if(argc == 2) {
+        printf("BVM: Reading File \n");
+        program = read_program(argv[1]);  
+    } else {
+        printf("BVM Fatal Error: no file specified \n");
+        return 0;
+    }
+    
+
     //system clock
     while(running) {
         //fetch 
-        int current_instruction = fetch();
+        int current_instruction = fetch;
         registers[PC]++;
         
         //decode and execute
         execute(current_instruction);
     }
+    //free program from heap
+    free(program);
     return 0;
 }
