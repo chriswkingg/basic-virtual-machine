@@ -53,10 +53,10 @@ void execute(int instruction) {
         }
         case ADD: {
             //gets number to the A register
-            int x = program[registers[PC]++];
+            int reg = program[registers[PC]++];
             
             //puts result back into the A register
-            registers[A] += x;
+            registers[A] += registers[reg];
             break;
         }
         case SUB: {
