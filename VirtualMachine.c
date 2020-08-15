@@ -54,9 +54,14 @@ void execute(int instruction) {
         case ADD: {
             //gets number to the A register
             int reg = program[registers[PC]++];
-            
+            int result = registers[reg] + registers[A];
+            if((registers[reg] > 0 && registers[A] > 0 && result < 0) || (registers[reg] < 0 && registers[A] < 0 && result > 0)) {
+                //overflow
+                printf("BVM Error: Sum Overflow\n");
+            }
             //puts result back into the A register
-            registers[A] += registers[reg];
+            
+            registers[A] = result;
             break;
         }
         case SUB: {
